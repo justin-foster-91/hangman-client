@@ -12,13 +12,9 @@ function App() {
   console.log('Before useEffect');
   useEffect(() => {
     if(!GameLogic.isGameStarted()){
-      GameLogic.startGame();
-      GameLogic.updateSecret()
-      setSecret(GameLogic.secretTargetWord)
-      setTarget(GameLogic.targetWord)
-      setGuessedLetters(GameLogic.lettersGuessed)
-    }
-
+      loadGame();
+    } 
+    
   })
 
   const submitGuess = (e) => {
@@ -44,18 +40,26 @@ function App() {
       .then(json => console.log(json))
   }
 
-  // const loadGame = () => {
-  //   fetch('http://localhost:8000/play', {
-  //     method: 'GET'
-  //   })
-  //     .then(res => res.json())
-  //     .then(json => {
-  //       // console.log(json);
-  //       setSecret(json.secretTarget)
-  //       setTarget(json.setTarget)
-  //       setGuessedLetters(json.lettersGuessed)
-  //     })
-  // }
+  const loadGame = () => {
+    fetch('http://localhost:8000/play', {
+      method: 'GET'
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (json.message === "Empty"){
+          GameLogic.startGame();
+          GameLogic.updateSecret()
+          setSecret(GameLogic.secretTargetWord)
+          setTarget(GameLogic.targetWord)
+          setGuessedLetters(GameLogic.lettersGuessed)
+        } else{
+          setSecret(json.secretTarget)
+          setTarget(json.targetWord)
+          setGuessedLetters(JSON.parse(json.lettersGuessed))
+          GameLogic.setStoredInfo(json.targetWord, json.secretTarget, JSON.parse(json.lettersGuessed))  
+        }
+      })
+  }
 
   return (
     <>
@@ -69,11 +73,9 @@ function App() {
         <input type='submit' value='Submit'></input>
       </form>
 
-      Letters Guessed: {guessedLetters}
+      Letters Guessed: {guessedLetters.map(letter => letter.toUpperCase()).join(' ')}
     </>
   );
 }
-
-// Look into blanking out form on submit
 
 export default App;

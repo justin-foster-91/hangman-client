@@ -52,6 +52,12 @@ function display(){
   console.log(secretTargetWord)
 }
 
+export function setStoredInfo(target, secret, letters){
+  lettersGuessed = letters;
+  targetWord = target;
+  secretTargetWord = secret;
+}
+
 // function gameLoop(){
 //   startGame();
 //   updateSecret();
